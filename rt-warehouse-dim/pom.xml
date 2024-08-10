@@ -18,5 +18,6 @@
             <artifactId>rt-warehouse-commom</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 </project>
