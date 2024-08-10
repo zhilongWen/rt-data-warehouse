@@ -11,6 +11,10 @@
     <packaging>pom</packaging>
 
     <name>RT : Data : Warehouse</name>
+    <modules>
+        <module>rt-warehouse-commom</module>
+        <module>rt-warehouse-dim</module>
+    </modules>
 
     <properties>
         <java.version>1.8</java.version>
