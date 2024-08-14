@@ -54,7 +54,7 @@ default:
   parallelism: 1
 
 restart:
-  strategy: 
+  strategy:
     - fix:
         attempts: 3
         delay: 60000 # ms
@@ -67,3 +67,5 @@ checkpoint:
   min-between: 500 # ms
   timeout: 60000 # ms
   failure-num: 100
+  state-storage: filesystem
+  state-dir: hdfs://hadoop102:8020/rt/checkpoint/

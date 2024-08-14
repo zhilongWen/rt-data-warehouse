@@ -108,8 +108,9 @@ public class DimApp {
 //        config.set(CheckpointingOptions.CHECKPOINTS_DIRECTORY, "hdfs://hadoop102:8020/rt/checkpoint/DimApp");
 //        env.configure(config);
 
+        StreamExecutionEnvironment env = StreamExecEnvConf.builderStreamEnv(args);
 
-        StreamExecutionEnvironment env = new MainAPP().start(args, DimApp.class.getSimpleName());
+        System.setProperty("HADOOP_USER_NAME", "root");
 
         SingleOutputStreamOperator<JSONObject> dbLogStream = env
                 .fromSource(
@@ -146,7 +147,7 @@ public class DimApp {
                 .uid("table_process")
                 .setParallelism(1)
                 .flatMap(new DimBinlogEtlAndBuilderHBaseTableFun())
-                .setParallelism(1) ;
+                .setParallelism(1);
 
         // 配置广播
         MapStateDescriptor<String, TableProcessDim> dimBroadCastStateDescriptor =
@@ -157,7 +158,8 @@ public class DimApp {
         dbLogStream.connect(dimBroadcastStream)
                 .process(new TableProcessFunction())
                 .setParallelism(4)
-                .print();
+                .addSink(new HBaseSinkFunction());
+////                .print();
 
         env.execute();
     }

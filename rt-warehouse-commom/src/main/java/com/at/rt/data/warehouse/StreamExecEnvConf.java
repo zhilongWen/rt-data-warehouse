@@ -19,6 +19,9 @@ import java.util.UUID;
 import static com.at.rt.data.warehouse.constant.FlinkConfConstant.*;
 import static org.apache.flink.streaming.api.environment.CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION;
 
+/**
+ * @author wenzhilong
+ */
 public class StreamExecEnvConf {
 
     private static final Logger logger = LoggerFactory.getLogger(StreamExecEnvConf.class);
@@ -31,7 +34,15 @@ public class StreamExecEnvConf {
 
         logger.info("input args:{}", parameterTool.toMap());
 
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        StreamExecutionEnvironment env;
+
+        if (parameterTool.getBoolean(ISLOCAL)){
+            Configuration configuration = new Configuration();
+            configuration.setString("rest.port","9099");
+            env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
+        }else {
+            env = StreamExecutionEnvironment.getExecutionEnvironment();
+        }
 
         // 测试时可以设置 pipeline.operator-chaining = false，使 operator 不能 changing 再一起
         if (parameterTool.getBoolean(PIPELINE_OPERATOR_CHAINING)) {

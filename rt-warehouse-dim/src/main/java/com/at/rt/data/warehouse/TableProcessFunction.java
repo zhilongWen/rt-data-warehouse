@@ -61,7 +61,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, T
         String table = value.getString("table");
 
         // 根据表名先到广播状态中获取对应的配置信息
-        TableProcessDim tableProcessDim = null;
+        TableProcessDim tableProcessDim;
 
         if (!((tableProcessDim = dimBroadcastState.get(table)) != null
                 || (tableProcessDim = dimConfigMap.get(table)) != null)) {

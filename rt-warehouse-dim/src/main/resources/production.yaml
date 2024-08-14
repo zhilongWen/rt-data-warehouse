@@ -1,4 +1,6 @@
 
+isLocal: true
+
 # Flink Execute Environment
 execute:
   env:
@@ -26,6 +28,6 @@ checkpoint:
   timeout: 60000 # ms
   failure-num: 100
   state-storage: filesystem
-  state-dir: hdfs://hadoop102:8020/rt/checkpoint/
+  state-dir: hdfs://hadoop102:8020/rt/checkpoint/DimApp
 
 
