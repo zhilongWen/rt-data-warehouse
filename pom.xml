@@ -11,6 +11,10 @@
     <packaging>pom</packaging>
 
     <name>RT : Data : Warehouse</name>
+    <modules>
+        <module>rt-warehouse-commom</module>
+        <module>rt-warehouse-dim</module>
+    </modules>
 
     <properties>
         <java.version>1.8</java.version>
@@ -20,7 +24,7 @@
         <flink.version>1.17.1</flink.version>
         <scala.version>2.12</scala.version>
         <hadoop.version>3.3.4</hadoop.version>
-        <flink-cdc.vesion>2.4.0</flink-cdc.vesion>
+        <flink-cdc.vesion>2.4.2</flink-cdc.vesion>
         <fastjson.version>1.2.83</fastjson.version>
         <hbase.version>2.4.11</hbase.version>
     </properties>
@@ -60,6 +64,7 @@
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
+
 
         <!--如果保存检查点到hdfs上，需要引入此依赖-->
         <dependency>
@@ -103,6 +108,7 @@
             <scope>provided</scope>
         </dependency>
 
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-api-java-bridge</artifactId>
@@ -131,10 +137,20 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
+
     <dependencyManagement>
+
         <dependencies>
+
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
@@ -183,7 +199,7 @@
             <dependency>
                 <groupId>org.apache.doris</groupId>
                 <artifactId>flink-doris-connector-1.17</artifactId>
-                <version>1.4.0</version>
+                <version>1.5.2</version>
             </dependency>
 
             <dependency>
@@ -209,7 +225,16 @@
                 <artifactId>lettuce-core</artifactId>
                 <version>6.2.4.RELEASE</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>2.2</version>
+            </dependency>
+
         </dependencies>
+
     </dependencyManagement>
 
     <build>
@@ -258,4 +283,6 @@
             </plugin>
         </plugins>
     </build>
+
+
 </project>
