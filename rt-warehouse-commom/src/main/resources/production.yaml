@@ -1,0 +1,69 @@
+
+server:
+  port: 10086
+  name: test-yaml-application
+
+zookeeper:
+  server: hadoop102:2181,hadoop103:2181,hadoop104:2181
+  listerer-topic: 9870
+
+redis:
+  port: 6379
+
+kafka:
+  consumer:
+    - app1:
+        server: hadoop102:9092
+        topic: db_log_topic
+        group_id: db_log_topic_group
+    - app2:
+        server: hadoop103:9092
+        topic: log_log_topic
+        group_id: log_log_topic_group
+  product:
+    - p1:
+        server: 127.0.0.1:9092
+        topic: test_sink
+    - p2:
+        server: 127.0.0.1:9092
+        topic: test_sink
+
+test: 111
+
+1: 2
+
+abc:
+  - 1
+  - 2
+  - 3
+  - 4:
+      sss: a
+      aa: a
+      q1: 1
+
+# Flink Execute Environment
+execute:
+  env:
+    - streaming
+    - batch
+
+pipeline:
+  operator-chaining: false
+
+default:
+  parallelism: 1
+
+restart:
+  strategy: 
+    - fix:
+        attempts: 3
+        delay: 60000 # ms
+
+checkpoint:
+  enable: true
+  type: AT_LEAST_ONCE # 1 AT_LEAST_ONCE 0  EXACTLY_ONCE
+  unaligned: false # EXACTLY_ONCE 模式下这里设置 true 才有意义 Unaligned checkpoints are currently not supported for custom partitioners, as rescaling is not guaranteed to work correctly. The user can force Unaligned Checkpoints by using 'execution.checkpointing.unaligned.forced'
+  interval: 120000 # ms
+  min-between: 500 # ms
+  timeout: 60000 # ms
+  failure-num: 100
