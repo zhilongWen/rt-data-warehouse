@@ -3,20 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.at.rt.data.warehouse</groupId>
-        <artifactId>rt-data-warehouse</artifactId>
+        <artifactId>rt-warehouse-dwd</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>rt-warehouse-dim</artifactId>
+    <artifactId>rt-warehouse-dwd-base-log</artifactId>
     <packaging>jar</packaging>
 
-    <name>RT : Warehouse : DIM</name>
+    <name>RT : Warehouse : DWD : Base : Log</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.at.rt.data.warehouse</groupId>
-            <artifactId>rt-warehouse-commom</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
 </project>

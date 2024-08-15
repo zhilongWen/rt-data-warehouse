@@ -7,10 +7,14 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>rt-warehouse-dim</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>rt-warehouse-dwd</artifactId>
+    <packaging>pom</packaging>
 
-    <name>RT : Warehouse : DIM</name>
+    <name>RT : Warehouse DWD</name>
+    <modules>
+        <module>rt-warehouse-dwd-base-db</module>
+        <module>rt-warehouse-dwd-base-log</module>
+    </modules>
 
     <dependencies>
         <dependency>

@@ -14,6 +14,7 @@
     <modules>
         <module>rt-warehouse-commom</module>
         <module>rt-warehouse-dim</module>
+        <module>rt-warehouse-dwd</module>
     </modules>
 
     <properties>
