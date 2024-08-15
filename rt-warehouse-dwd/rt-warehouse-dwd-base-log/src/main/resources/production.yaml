@@ -1,0 +1,51 @@
+
+isLocal: true
+
+# Flink Execute Environment
+execute:
+  env:
+    - streaming
+    - batch
+
+pipeline:
+  operator-chaining: false
+
+default:
+  parallelism: 1
+
+restart:
+  strategy:
+    - fix:
+        attempts: 3
+        delay: 60000 # ms
+
+checkpoint:
+  enable: true
+  type: AT_LEAST_ONCE # 1 AT_LEAST_ONCE 0  EXACTLY_ONCE
+  unaligned: false # EXACTLY_ONCE 模式下这里设置 true 才有意义 Unaligned checkpoints are currently not supported for custom partitioners, as rescaling is not guaranteed to work correctly. The user can force Unaligned Checkpoints by using 'execution.checkpointing.unaligned.forced'
+  interval: 120000 # ms
+  min-between: 500 # ms
+  timeout: 60000 # ms
+  failure-num: 100
+  state-storage: filesystem
+  state-dir: hdfs://hadoop102:8020/rt/checkpoint/DWDBaseLog
+
+# KAFKA
+kafka:
+  consumer:
+    - dwd_base_log_split:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: ODS_BASE_LOG
+        group-id: dwd_base_log_split
+        offset: earliest
+        isolation_level: read_committed
+  product:
+    - error_log_tag:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: dwd_error_log
+        guarantee: none # exactly-once at-least-once  none
+        # 设置了 exactly-once
+        # 在消费端，需要设置消费的隔离级别为读已提交 .setProperty(ConsumerConfig.ISOLATION_LEVEL_CONFIG,"read_committed")
+        tid-prefix: dwd_base_log_
+        # 设置事务的超时时间   检查点超时时间 <     事务的超时时间 <= 事务最大超时时间
+        transaction-timeout: 61000

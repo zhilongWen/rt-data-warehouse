@@ -36,11 +36,11 @@ public class StreamExecEnvConf {
 
         StreamExecutionEnvironment env;
 
-        if (parameterTool.getBoolean(ISLOCAL)){
+        if (parameterTool.getBoolean(ISLOCAL)) {
             Configuration configuration = new Configuration();
-            configuration.setString("rest.port","9099");
+            configuration.setString("rest.port", "9099");
             env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
-        }else {
+        } else {
             env = StreamExecutionEnvironment.getExecutionEnvironment();
         }
 
