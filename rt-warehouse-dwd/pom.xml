@@ -14,6 +14,7 @@
     <modules>
         <module>rt-warehouse-dwd-base-db</module>
         <module>rt-warehouse-dwd-base-log</module>
+        <module>rt-warehouse-dwd-interaction-comment-info</module>
     </modules>
 
     <dependencies>
