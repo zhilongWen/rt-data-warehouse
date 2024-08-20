@@ -49,3 +49,28 @@ kafka:
         tid-prefix: dwd_base_log_
         # 设置事务的超时时间   检查点超时时间 <     事务的超时时间 <= 事务最大超时时间
         transaction-timeout: 61000
+    - dwd_traffic_page:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: dwd_traffic_page
+        guarantee: exactly-once # exactly-once at-least-once  none
+        # 设置了 exactly-once
+        # 在消费端，需要设置消费的隔离级别为读已提交 .setProperty(ConsumerConfig.ISOLATION_LEVEL_CONFIG,"read_committed")
+        tid-prefix: dwd_traffic_page
+        # 设置事务的超时时间   检查点超时时间 <     事务的超时时间 <= 事务最大超时时间
+        transaction-timeout: 61000
+    - dwd_traffic_err:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: dwd_traffic_err
+        guarantee: none # exactly-once at-least-once  none
+    - dwd_traffic_start:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: dwd_traffic_start
+        guarantee: none # exactly-once at-least-once  none
+    - dwd_traffic_display:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: dwd_traffic_display
+        guarantee: none # exactly-once at-least-once  none
+    - dwd_traffic_action:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: dwd_traffic_action
+        guarantee: none # exactly-once at-least-once  none

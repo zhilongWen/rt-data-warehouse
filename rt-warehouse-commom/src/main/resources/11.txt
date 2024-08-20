@@ -2,3 +2,19 @@
 /opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_error_log
 
 
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_traffic_page
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_traffic_page
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_traffic_err
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_traffic_err
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_traffic_start
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_traffic_start
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_traffic_display
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_traffic_display
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_traffic_action
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_traffic_action
+
+
