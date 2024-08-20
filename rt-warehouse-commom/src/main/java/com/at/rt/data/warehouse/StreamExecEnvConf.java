@@ -36,7 +36,7 @@ public class StreamExecEnvConf {
 
         StreamExecutionEnvironment env;
 
-        if (parameterTool.getBoolean(ISLOCAL)) {
+        if (parameterTool.getBoolean(ISLOCAL, false)) {
             Configuration configuration = new Configuration();
             configuration.setString("rest.port", "9099");
             env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
@@ -45,19 +45,19 @@ public class StreamExecEnvConf {
         }
 
         // 测试时可以设置 pipeline.operator-chaining = false，使 operator 不能 changing 再一起
-        if (parameterTool.getBoolean(PIPELINE_OPERATOR_CHAINING)) {
+        if (parameterTool.getBoolean(PIPELINE_OPERATOR_CHAINING, true)) {
             env.disableOperatorChaining();
         }
 
         // 重启策略
-        if (StringUtils.isNotBlank(RESTART_STRATEGY + ".fix")) {
+        if (StringUtils.isNotBlank(parameterTool.get(RESTART_STRATEGY + ".fix", ""))) {
             env.getConfig().setRestartStrategy(
                     RestartStrategies.fixedDelayRestart(
                             parameterTool.getInt(RESTART_STRATEGY_FIX_ATTEMPTS, 3),
                             parameterTool.getLong(RESTART_STRATEGY_FIX_DELAY, 60000)
                     )
             );
-        } else if (StringUtils.isNotBlank(RESTART_STRATEGY + ".fail")) {
+        } else if (StringUtils.isNotBlank(parameterTool.get(RESTART_STRATEGY + ".fail", ""))) {
             env.getConfig().setRestartStrategy(
                     RestartStrategies.failureRateRestart(
                             parameterTool.getInt(RESTART_STRATEGY_FAIL_FAILURERATE, 2),
@@ -69,7 +69,7 @@ public class StreamExecEnvConf {
             env.getConfig().setRestartStrategy(RestartStrategies.noRestart());
         }
 
-        if (parameterTool.getBoolean(CHECKPOINT_ENABLE)) {
+        if (parameterTool.getBoolean(CHECKPOINT_ENABLE, false)) {
             setCheckpoint(env, parameterTool);
         }
 
