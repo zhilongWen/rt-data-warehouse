@@ -11,9 +11,15 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.ExecutionCheckpointingOptions;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.bridge.java.StreamStatementSet;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static com.at.rt.data.warehouse.constant.FlinkConfConstant.*;
@@ -81,6 +87,12 @@ public class StreamExecEnvConf {
         return env;
     }
 
+    public static StreamTableEnvironment builderStreamTableEnv(String[] args) {
+        StreamExecutionEnvironment env = builderStreamEnv(args);
+        EnvironmentSettings settings = EnvironmentSettings.newInstance().inStreamingMode().build();
+        return StreamTableEnvironment.create(env, settings);
+    }
+
     private static void setCheckpoint(StreamExecutionEnvironment env, ParameterTool parameterTool) {
 
         CheckpointConfig checkpointConfig = env.getCheckpointConfig();
@@ -129,5 +141,78 @@ public class StreamExecEnvConf {
         config.set(CheckpointingOptions.CHECKPOINT_STORAGE, parameterTool.get(CHECKPOINT_STATE_STORAGE, "filesystem"));
         config.set(CheckpointingOptions.CHECKPOINTS_DIRECTORY, parameterTool.get(CHECKPOINT_STATE_DIR, "hdfs://hadoop102:8020/rt/checkpoint/" + UUID.randomUUID()));
         env.configure(config);
+    }
+
+    public static void execSQL(StreamTableEnvironment tableEnv, String sql) {
+
+        List<String> sqlTokens = parseSqlTokens(sql);
+
+        for (int i = 0; i < sqlTokens.size(); i++) {
+
+            String sqlToken = sqlTokens.get(i);
+            logger.info("{} \n", sqlToken);
+
+            if ("BEGIN STATEMENT SET".equals(sqlToken.toUpperCase(Locale.ROOT))) {
+
+                StreamStatementSet statementSet = tableEnv.createStatementSet();
+
+                while (++i < sqlTokens.size()) {
+
+                    sqlToken = sqlTokens.get(i);
+                    logger.info("{} \n", sqlToken);
+
+                    if ("END".equals(sqlToken.toUpperCase(Locale.ROOT))) {
+                        break;
+                    }
+
+                    statementSet.addInsertSql(sqlTokens.get(i));
+                }
+
+                statementSet.execute();
+            } else {
+                tableEnv.executeSql(sqlToken);
+            }
+        }
+    }
+
+    private static List<String> parseSqlTokens(String sql) {
+
+        String[] sqlArr = StringUtils.splitByWholeSeparatorPreserveAllTokens(sql, "\n");
+
+        List<String> sqlTokens = new ArrayList<>();
+
+        StringBuilder builder = new StringBuilder();
+
+        for (String sqlStr : sqlArr) {
+
+            sqlStr = sqlStr.trim();
+
+            if (StringUtils.isBlank(sqlStr)) {
+                continue;
+            }
+
+            if (StringUtils.contains(sqlStr, "--")) {
+                int idx = StringUtils.indexOf(sqlStr, "--");
+                sqlStr = StringUtils.substring(sqlStr, 0, idx);
+            }
+
+            if (StringUtils.isBlank(sqlStr)) {
+                continue;
+            }
+
+            if (StringUtils.contains(sqlStr, ";")) {
+                int idx = StringUtils.indexOf(sqlStr, ";");
+                sqlStr = StringUtils.substring(sqlStr, 0, idx);
+                if (StringUtils.isNotBlank(sqlStr)) {
+                    builder.append(sqlStr);
+                }
+                sqlTokens.add(builder.toString());
+                builder.delete(0, builder.length());
+            } else {
+                builder.append(sqlStr).append("\n");
+            }
+        }
+
+        return sqlTokens;
     }
 }

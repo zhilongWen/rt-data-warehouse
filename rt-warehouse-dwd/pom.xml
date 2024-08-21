@@ -16,6 +16,7 @@
         <module>rt-warehouse-dwd-base-log</module>
         <module>rt-warehouse-dwd-interaction-comment-info</module>
         <module>rt-warehouse-dwd-trade-cart-add</module>
+        <module>rt-warehouse-dwd-trade-order-detail</module>
     </modules>
 
     <dependencies>
