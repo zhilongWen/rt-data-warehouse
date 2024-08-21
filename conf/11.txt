@@ -32,6 +32,7 @@
 /opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_trade_order_payment_success
 /opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_trade_order_payment_success
 
-
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_trade_order_refund
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_trade_order_refund
 
 

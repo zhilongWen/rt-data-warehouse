@@ -19,6 +19,7 @@
         <module>rt-warehouse-dwd-trade-order-detail</module>
         <module>rt-warehouse-dwd-trade-order-cancel-detail</module>
         <module>rt-warehouse-dwd-trade-order-pay-suc-detail</module>
+        <module>rt-warehouse-dwd-trade-order-refund</module>
     </modules>
 
     <dependencies>
