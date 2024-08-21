@@ -28,6 +28,8 @@ public class StreamExecEnvConf {
 
     public static StreamExecutionEnvironment builderStreamEnv(String[] args) {
 
+        System.setProperty("HADOOP_USER_NAME", "root");
+
         ParameterTool parameterTool = ParameterTool.fromArgs(args)
                 .mergeWith(ParameterTool.fromSystemProperties())
                 .mergeWith(ParameterTool.fromMap(YamlUtil.parseYaml()));
