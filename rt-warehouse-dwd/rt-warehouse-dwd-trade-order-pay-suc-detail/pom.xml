@@ -1,0 +1,15 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.at.rt.data.warehouse</groupId>
+        <artifactId>rt-warehouse-dwd</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>rt-warehouse-dwd-trade-order-pay-suc-detail</artifactId>
+    <packaging>jar</packaging>
+
+    <name>RT : Warehouse : DWD : Trade : Order : Pay : Suc : Detail</name>
+
+</project>
