@@ -1,0 +1,137 @@
+package com.at.rt.data.warehouse.dwd;
+
+import com.at.rt.data.warehouse.bean.TableProcessConfDwd;
+import com.at.rt.data.warehouse.utils.JdbcUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.flink.api.common.state.BroadcastState;
+import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
+import org.apache.flink.util.Collector;
+
+import java.sql.Connection;
+import java.util.*;
+
+/**
+ * @author wenzhilong
+ */
+public class BaseDbTableProcessFunction
+        extends BroadcastProcessFunction<JsonNode, TableProcessConfDwd, Tuple2<JsonNode, TableProcessConfDwd>> {
+
+    private final MapStateDescriptor<String, TableProcessConfDwd> mapStateDescriptor;
+
+    private final Map<String, TableProcessConfDwd> configMap = new HashMap<>();
+
+    public BaseDbTableProcessFunction(MapStateDescriptor<String, TableProcessConfDwd> mapStateDescriptor) {
+        this.mapStateDescriptor = mapStateDescriptor;
+    }
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+
+        // 将配置信息预加载到程序中
+        Connection connection = JdbcUtil.getMySQLConnection();
+        List<TableProcessConfDwd> tableProcessDwdList = JdbcUtil.queryList(
+                connection,
+                "select * from rt_warehouse_conf_db.table_process_dwd_conf",
+                TableProcessConfDwd.class,
+                true
+        );
+
+        for (TableProcessConfDwd tableProcessDwd : tableProcessDwdList) {
+            String sourceTable = tableProcessDwd.getSourceTable();
+            String sourceType = tableProcessDwd.getSourceType();
+            String key = getKey(sourceTable, sourceType);
+            configMap.put(key, tableProcessDwd);
+        }
+
+        JdbcUtil.closeMySQLConnection(connection);
+    }
+
+    private String getKey(String sourceTable, String sourceType) {
+        return sourceTable + ":" + sourceType;
+    }
+
+    @Override
+    public void processElement(JsonNode value,
+                               BroadcastProcessFunction<JsonNode, TableProcessConfDwd, Tuple2<JsonNode, TableProcessConfDwd>>.ReadOnlyContext ctx,
+                               Collector<Tuple2<JsonNode, TableProcessConfDwd>> out) throws Exception {
+
+        // 处理主流业务数据
+
+        //{"table":"xxx","type":"update","ts":1710075970,"data":{"id":1,"tm_name":"Redmi","logo_url":"abc","create_time":"2021-12-14 00:00:00","operate_time":null},"old":{"tm_name":"Redmi111"}}
+        // 获取处理的业务数据库表的表名
+        String table = value.get("table").asText();
+        // 获取操作类型
+        String type = value.get("type").asText();
+        // 拼接key
+        String key = getKey(table, type);
+        // 获取广播状态
+        ReadOnlyBroadcastState<String, TableProcessConfDwd> broadcastState = ctx.getBroadcastState(mapStateDescriptor);
+        // 根据key到广播状态以及configMap中获取对应的配置信息
+        TableProcessConfDwd tp = null;
+
+        if (!((tp = broadcastState.get(key)) != null || (tp = configMap.get(key)) != null)) {
+            return;
+        }
+
+        // 说明当前数据，是需要动态分流处理的事实表数据，将data部分传递到下游
+        ObjectNode dataJsonObj = (ObjectNode) value.get("data");
+        // 在向下游传递数据前，过滤掉不需要传递的字段
+        String sinkColumns = tp.getSinkColumns();
+        deleteNotNeedColumns(dataJsonObj, sinkColumns);
+        // 在向下游传递数据前， 将ts事件时间补充到data对象上
+        Long ts = value.get("ts").asLong();
+        dataJsonObj.put("ts", ts);
+
+        out.collect(Tuple2.of(dataJsonObj, tp));
+    }
+
+    @Override
+    public void processBroadcastElement(TableProcessConfDwd value,
+                                        BroadcastProcessFunction<JsonNode, TableProcessConfDwd, Tuple2<JsonNode, TableProcessConfDwd>>.Context ctx,
+                                        Collector<Tuple2<JsonNode, TableProcessConfDwd>> out) throws Exception {
+
+        // 处理广播流配置数据
+
+        //获取对配置表进行的操作的类型
+        String op = value.getOp();
+        //获取广播状态
+        BroadcastState<String, TableProcessConfDwd> broadcastState = ctx.getBroadcastState(mapStateDescriptor);
+        //获取业务数据库的表的表名
+        String sourceTable = value.getSourceTable();
+        //获取业务数据库的表对应的操作类型
+        String sourceType = value.getSourceType();
+        //拼接key
+        String key = getKey(sourceTable, sourceType);
+
+        if ("d".equals(op)) {
+            //从配置表中删除了一条数据，那么需要将广播状态以及configMap中对应的配置也删除掉
+            broadcastState.remove(key);
+            configMap.remove(key);
+        } else {
+            //从配置表中读取数据或者添加、更新了数据  需要将最新的这条配置信息放到广播状态以及configMap中
+            broadcastState.put(key, value);
+            configMap.put(key, value);
+        }
+    }
+
+    /**
+     * 过滤掉不需要传递的字段
+     * dataJsonObj  {"tm_name":"Redmi","create_time":"2021-12-14 00:00:00","logo_url":"555","id":1}
+     * sinkColumns  id,tm_name
+     */
+    private static void deleteNotNeedColumns(JsonNode jsonNode, String sinkColumns) {
+        List<String> columnList = Arrays.asList(sinkColumns.split(","));
+        Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
+        while (fields.hasNext()) {
+            String fieldKey = fields.next().getKey();
+            if (!columnList.contains(fieldKey)) {
+                fields.remove();
+            }
+        }
+    }
+}

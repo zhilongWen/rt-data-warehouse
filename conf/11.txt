@@ -37,3 +37,16 @@
 
 /opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_trade_refund_payment_success
 /opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_trade_refund_payment_success
+
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_interaction_favor_add
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_interaction_favor_add
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_tool_coupon_get
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_tool_coupon_get
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_tool_coupon_use
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_tool_coupon_use
+
+/opt/module/kafka-3.7/bin/kafka-topics.sh --bootstrap-server hadoop102:9092 --create --partitions 3 --replication-factor 3 --topic dwd_user_register
+/opt/module/kafka-3.7/bin/kafka-console-consumer.sh --bootstrap-server hadoop102:9092 --topic dwd_user_register

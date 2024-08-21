@@ -59,22 +59,42 @@ public class FlinkKafkaUtil {
                 .build();
     }
 
-    public static KafkaSink<String> getProduct(ParameterTool parameterTool, String prefix) {
+    public static <T> KafkaSink<T> getProduct(ParameterTool parameterTool, String prefix, KafkaRecordSerializationSchema<T> schema) {
 
-        KafkaSinkBuilder<String> kafkaSinkBuilder = KafkaSink.<String>builder()
+        KafkaSinkBuilder<T> kafkaSinkBuilder = KafkaSink.<T>builder()
                 .setBootstrapServers(parameterTool.get(String.format("kafka.product.%s.broker", prefix)))
-                .setRecordSerializer(
-                        KafkaRecordSerializationSchema.builder()
-                                .setTopic(parameterTool.get(String.format("kafka.product.%s.topic", prefix)))
-                                .setValueSerializationSchema(new SimpleStringSchema())
-                                .build()
-                );
+                .setRecordSerializer(schema);
 
         setProductGuarantee(kafkaSinkBuilder, parameterTool, prefix);
 
         kafkaSinkBuilder.setKafkaProducerConfig(getProductProps(parameterTool, prefix));
 
         return kafkaSinkBuilder.build();
+    }
+
+    public static KafkaSink<String> getProduct(ParameterTool parameterTool, String prefix) {
+
+//        KafkaSinkBuilder<String> kafkaSinkBuilder = KafkaSink.<String>builder()
+//                .setBootstrapServers(parameterTool.get(String.format("kafka.product.%s.broker", prefix)))
+//                .setRecordSerializer(
+//                        KafkaRecordSerializationSchema.builder()
+//                                .setTopic(parameterTool.get(String.format("kafka.product.%s.topic", prefix)))
+//                                .setValueSerializationSchema(new SimpleStringSchema())
+//                                .build()
+//                );
+//
+//        setProductGuarantee(kafkaSinkBuilder, parameterTool, prefix);
+//
+//        kafkaSinkBuilder.setKafkaProducerConfig(getProductProps(parameterTool, prefix));
+//
+//        return kafkaSinkBuilder.build();
+
+        KafkaRecordSerializationSchema<String> schema = KafkaRecordSerializationSchema.builder()
+                .setTopic(parameterTool.get(String.format("kafka.product.%s.topic", prefix)))
+                .setValueSerializationSchema(new SimpleStringSchema())
+                .build();
+
+        return getProduct(parameterTool, prefix, schema);
     }
 
     private static Properties getProductProps(ParameterTool parameterTool, String prefix) {
