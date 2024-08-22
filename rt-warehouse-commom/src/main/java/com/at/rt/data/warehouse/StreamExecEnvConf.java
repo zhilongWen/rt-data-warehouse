@@ -1,5 +1,6 @@
 package com.at.rt.data.warehouse;
 
+import com.at.rt.data.warehouse.exception.RTWarehouseException;
 import com.at.rt.data.warehouse.utils.YamlUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
@@ -46,7 +47,7 @@ public class StreamExecEnvConf {
 
         if (parameterTool.getBoolean(ISLOCAL, false)) {
             Configuration configuration = new Configuration();
-            configuration.setString("rest.port", "9099");
+            configuration.setString("rest.port", parameterTool.get("rest.port", "9099"));
             env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
         } else {
             env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -152,7 +153,17 @@ public class StreamExecEnvConf {
             String sqlToken = sqlTokens.get(i);
             logger.info("{} \n", sqlToken);
 
-            if ("BEGIN STATEMENT SET".equals(sqlToken.toUpperCase(Locale.ROOT))) {
+            if (sqlToken.toUpperCase(Locale.ROOT).startsWith("SET")) {
+                String[] elems = sqlToken.substring(3)
+                        .replace("'", "")
+                        .split("=", -1);
+
+                if (elems.length != 2 || StringUtils.isBlank(elems[0].trim()) || StringUtils.isBlank(elems[1].trim())) {
+                    throw new RTWarehouseException("flink sql set config error : " + sqlToken);
+                }
+
+                tableEnv.getConfig().set(elems[0].trim(), elems[1].trim());
+            } else if ("BEGIN STATEMENT SET".equals(sqlToken.toUpperCase(Locale.ROOT))) {
 
                 StreamStatementSet statementSet = tableEnv.createStatementSet();
 

@@ -7,6 +7,9 @@ execute:
     - streaming
     - batch
 
+rest:
+  port: 9098
+  
 pipeline:
   operator-chaining: false
 
