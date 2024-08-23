@@ -13,6 +13,7 @@
     <name>RT : Warehouse : DWS</name>
     <modules>
         <module>rt-warehouse-dws-traffic-source-keyword-page-view-window</module>
+        <module>rt-warehouse-dws-traffic-vc-ch-ar-is_new-page-view-window</module>
     </modules>
 
     <dependencies>
