@@ -16,6 +16,7 @@
         <module>rt-warehouse-dws-traffic-vc-ch-ar-is_new-page-view-window</module>
         <module>rt-warehouse-dws-traffic-home-detail-page-view-window</module>
         <module>rt-warehouse-dws-user-user-login-window</module>
+        <module>rt-warehouse-dws-user-user-register-window</module>
     </modules>
 
     <dependencies>
