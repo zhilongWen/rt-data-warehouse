@@ -30,4 +30,13 @@ checkpoint:
   state-storage: filesystem
   state-dir: hdfs://hadoop102:8020/rt/checkpoint/DimApp
 
+# KAFKA
+kafka:
+  consumer:
+    - ODS_BASE_DB:
+        broker: hadoop102:9092,hadoop103:9092,hadoop104:9092
+        topic: ODS_BASE_DB
+        group-id: DimApp
+        offset: latest # group earliest latest  timestamp
+        isolation_level: read_committed
 

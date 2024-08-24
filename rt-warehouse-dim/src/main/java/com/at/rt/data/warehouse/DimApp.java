@@ -2,13 +2,13 @@ package com.at.rt.data.warehouse;
 
 import com.alibaba.fastjson.JSONObject;
 import com.at.rt.data.warehouse.bean.TableProcessDim;
-import com.at.rt.data.warehouse.constant.RTWarehouseConstant;
 import com.at.rt.data.warehouse.utils.FlinkKafkaUtil;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -112,27 +112,24 @@ public class DimApp {
 
         System.setProperty("HADOOP_USER_NAME", "root");
 
+        ParameterTool parameterTool = (ParameterTool) env.getConfig().getGlobalJobParameters();
+
         SingleOutputStreamOperator<JSONObject> dbLogStream = env
                 .fromSource(
-                        FlinkKafkaUtil.getConsumer(
-                                RTWarehouseConstant.KAFKA_BROKERS,
-                                "ODS_BASE_DB",
-                                "dim_ods_base_db"
-                        ),
+                        FlinkKafkaUtil.getConsumer(parameterTool, "ODS_BASE_DB"),
                         WatermarkStrategy.noWatermarks(),
-                        "dim_ods_base_db"
+                        "ODS_BASE_DB"
                 )
                 .setParallelism(2)
                 .flatMap(new MaxwellLogEtl())
                 .setParallelism(2);
-
         MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
                 .hostname("hadoop102")
                 .port(3306)
                 .username("root")
                 .password("root123")
                 .databaseList("rt_warehouse_conf_db")
-                .tableList("rt_warehouse_conf_db.table_process")
+                .tableList("rt_warehouse_conf_db.table_process_dim")
                 .deserializer(new JsonDebeziumDeserializationSchema())
                 // initial: 扫描一次全表，做一次快照，然后增量
                 .startupOptions(StartupOptions.initial())
@@ -142,9 +139,9 @@ public class DimApp {
                 .fromSource(
                         mySqlSource,
                         WatermarkStrategy.noWatermarks(),
-                        "table_process"
+                        "table_process_dim"
                 )
-                .uid("table_process")
+                .uid("table_process_dim")
                 .setParallelism(1)
                 .flatMap(new DimBinlogEtlAndBuilderHBaseTableFun())
                 .setParallelism(1);
@@ -159,7 +156,7 @@ public class DimApp {
                 .process(new TableProcessFunction())
                 .setParallelism(4)
                 .addSink(new HBaseSinkFunction());
-////                .print();
+//                .print();
 
         env.execute();
     }

@@ -37,7 +37,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, T
         Connection mySQLConnection = JdbcUtil.getMySQLConnection();
         List<TableProcessDim> tableProcessDimList = JdbcUtil.queryList(
                 mySQLConnection,
-                "select * from rt_warehouse_conf_db.table_process",
+                "select * from rt_warehouse_conf_db.table_process_dim",
                 TableProcessDim.class,
                 true);
         for (TableProcessDim tableProcessDim : tableProcessDimList) {
