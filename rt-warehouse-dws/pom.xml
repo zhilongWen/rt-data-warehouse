@@ -19,6 +19,7 @@
         <module>rt-warehouse-dws-user-user-register-window</module>
         <module>rt-warehouse-dws-trade-cart-add-uu-window</module>
         <module>rt-warehouse-dws-trade-payment-suc-window</module>
+        <module>rt-warehouse-dws-trade-order-window</module>
     </modules>
 
     <dependencies>
