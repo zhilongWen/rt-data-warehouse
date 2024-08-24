@@ -7,9 +7,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>rt-warehouse-dws-user-user-register-window</artifactId>
+    <artifactId>rt-warehouse-dws-trade-cart-add-uu-window</artifactId>
     <packaging>jar</packaging>
 
-    <name>RT : Warehouse : Uuser : User : Register : Window</name>
+    <name>RT : Warehouse : DWS : Trade : Cart : Add : Uu : Window</name>
 
 </project>
