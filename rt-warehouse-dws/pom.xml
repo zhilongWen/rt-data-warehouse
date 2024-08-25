@@ -21,6 +21,7 @@
         <module>rt-warehouse-dws-trade-payment-suc-window</module>
         <module>rt-warehouse-dws-trade-order-window</module>
         <module>rt-warehouse-dws-trade-sku-order-window</module>
+        <module>rt-warehouse-dws-trade-province-order-window</module>
     </modules>
 
     <dependencies>
